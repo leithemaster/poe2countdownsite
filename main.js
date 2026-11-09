@@ -1,4 +1,4 @@
-// Launch: Friday 11 December 2026, 1:00 PM PST (21:00 UTC).
+// Launch: Friday 11 December 2026, 1:00 PM PST = 3:00 PM CST in Texas (21:00 UTC).
 // GGG has confirmed the date; the hour follows their usual 1 PM Pacific launch slot. Change it here if they announce otherwise.
 const LAUNCH = Date.parse("2026-12-11T21:00:00Z");
 
@@ -16,8 +16,13 @@ function startCountdown() {
   const when = root.querySelector("[data-local]");
   if (when) {
     try {
-      const local = new Intl.DateTimeFormat(undefined, { weekday: "long", day: "numeric", month: "long", hour: "numeric", minute: "2-digit", timeZoneName: "short" }).format(LAUNCH);
-      when.textContent = `That's ${local} where you are.`;
+      // Hamza is in Texas (Central Time); show that first, and the viewer's own time if it differs.
+      const fmt = (tz) => new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit", timeZoneName: "short", ...(tz && { timeZone: tz }) }).format(LAUNCH);
+      const texas = fmt("America/Chicago");
+      const here = fmt();
+      when.textContent = here === texas
+        ? `Friday 11 December, ${texas} in Texas.`
+        : `Friday 11 December, ${texas} in Texas (${here} where you are).`;
     } catch (_) { /* keep the static fallback */ }
   }
   const tick = () => {
@@ -45,7 +50,7 @@ function calendarFile() {
     "DTSTART:20261211T210000Z",
     "DTEND:20261212T030000Z",
     "SUMMARY:Path of Exile 2 1.0 launch",
-    "DESCRIPTION:Path of Exile 2 leaves early access and goes free to play. Clear the evening\\, Hamza.",
+    "DESCRIPTION:Path of Exile 2 leaves early access and goes free to play. Clear the afternoon\\, Hamza: 3 PM Texas time.",
     "BEGIN:VALARM", "TRIGGER:-PT30M", "ACTION:DISPLAY", "DESCRIPTION:PoE2 launches in 30 minutes", "END:VALARM",
     "END:VEVENT", "END:VCALENDAR",
   ].join("\r\n");
